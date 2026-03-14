@@ -12,6 +12,12 @@ static Rectangle roomFloor = {0, 0, 520, 520};
 static bool gameOver = false;
 static bool win = false;
 
+Rectangle obstacles[] = {
+    {180, 180, 120, 30},
+    {500, 380, 80, 100},
+    {250, 450, 200, 30}
+};
+
 void OnLoad_Gameplay(void)
 {
     horror = LoadMusicStream("sounds/horor.ogg");
@@ -38,8 +44,8 @@ void OnUpdate_Gameplay(void)
 {
     if (!gameOver && !win)
     {
-        OnUpdate_Player(roomFloor);
-        OnUpdate_Oni(roomFloor);
+        OnUpdate_Player(roomFloor, obstacles, 3);
+        OnUpdate_Oni(roomFloor, obstacles, 3);
 
         if (CheckCollisionRecs(GetEntityHitbox(GetPlayer()), GetEntityHitbox(GetOni())))
         {
@@ -55,6 +61,12 @@ void OnDraw_Gameplay(void)
 {
     ClearBackground(BLACK);
     DrawRectangleRec(roomFloor, DARKBROWN);
+
+    for (int i = 0; i < 3; i++)
+    {
+        DrawRectangleRec(obstacles[i], BROWN);
+        DrawRectangleLinesEx(obstacles[i], 4, DARKBROWN);
+    }
 
     OnDraw_Player();
     OnDraw_Oni();

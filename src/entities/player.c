@@ -27,7 +27,7 @@ void OnLoad_Player()
     playerSprite.sourceRec = (Rectangle){0, 0, playerSprite.frameWidth, playerSprite.frameHeight};
 }
 
-void OnUpdate_Player(Rectangle roomFloor)
+void OnUpdate_Player(Rectangle roomFloor, Rectangle obstacles[], int obs_count)
 {
     Vector2 move = {0};
 
@@ -67,14 +67,34 @@ void OnUpdate_Player(Rectangle roomFloor)
         if (newPos.y + player.height > roomFloor.y + roomFloor.height)
             newPos.y = roomFloor.y + roomFloor.height - player.height;
 
-        player.position = newPos;
+        bool canMove = true;
 
-        playerSprite.frameTimer += GetFrameTime();
+        Rectangle playerRect = {newPos.x, newPos.y, player.width, player.height};
 
-        if (playerSprite.frameTimer >= playerSprite.frameSpeed)
+        for (int i = 0; i < obs_count; i++)
         {
-            playerSprite.frameTimer = 0;
-            playerSprite.currentFrame = (playerSprite.currentFrame + 1) % playerSprite.frameCount;
+            if (CheckCollisionRecs(playerRect, obstacles[i]))
+            {
+                canMove = false;
+                break;
+            }
+        }
+
+        if (canMove)
+        {
+            player.position = newPos;
+
+            playerSprite.frameTimer += GetFrameTime();
+
+            if (playerSprite.frameTimer >= playerSprite.frameSpeed)
+            {
+                playerSprite.frameTimer = 0;
+                playerSprite.currentFrame = (playerSprite.currentFrame + 1) % playerSprite.frameCount;
+            }
+        }
+        else
+        {
+            playerSprite.currentFrame = 0;
         }
     }
     else
@@ -103,7 +123,7 @@ void OnUnload_Player()
     UnloadTexture(playerSprite.texture);
 }
 
-Entity GetPlayer() 
+Entity GetPlayer()
 {
     return player;
 }

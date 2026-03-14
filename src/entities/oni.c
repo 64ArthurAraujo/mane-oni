@@ -29,14 +29,14 @@ void OnLoad_Oni()
     oniSprite.sourceRec = (Rectangle){0, 0, oniSprite.frameWidth, oniSprite.frameHeight};
 }
 
-void OnUpdate_Oni(Rectangle roomFloor)
+void OnUpdate_Oni(Rectangle roomFloor, Rectangle obstacles[], int obs_count)
 {
     Entity player = GetPlayer();
     Vector2 playerPos = player.position;
 
     Vector2 move = {0};
 
-    bool reachedX = fabsf(playerPos.x - oni.position.x) < player.width;
+    bool reachedX = fabsf(playerPos.x - oni.position.x) < player.width * 1.2f;
 
     if (reachedX)
     {
@@ -80,14 +80,34 @@ void OnUpdate_Oni(Rectangle roomFloor)
         if (newPos.y + oni.height > roomFloor.y + roomFloor.height)
             newPos.y = roomFloor.y + roomFloor.height - oni.height;
 
-        oni.position = newPos;
+        bool canMove = true;
 
-        oniSprite.frameTimer += GetFrameTime();
+        Rectangle oniRect = {newPos.x, newPos.y, oni.width, oni.height};
 
-        if (oniSprite.frameTimer >= oniSprite.frameSpeed)
+        for (int i = 0; i < obs_count; i++)
         {
-            oniSprite.frameTimer = 0;
-            oniSprite.currentFrame = (oniSprite.currentFrame + 1) % oniSprite.frameCount;
+            if (CheckCollisionRecs(oniRect, obstacles[i]))
+            {
+                canMove = false;
+                break;
+            }
+        }
+
+        if (canMove)
+        {
+            oni.position = newPos;
+
+            oniSprite.frameTimer += GetFrameTime();
+
+            if (oniSprite.frameTimer >= oniSprite.frameSpeed)
+            {
+                oniSprite.frameTimer = 0;
+                oniSprite.currentFrame = (oniSprite.currentFrame + 1) % oniSprite.frameCount;
+            }
+        }
+        else
+        {
+            oniSprite.currentFrame = 0;
         }
     }
     else
