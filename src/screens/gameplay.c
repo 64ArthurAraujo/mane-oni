@@ -7,7 +7,7 @@
 static Music horror;
 static Texture2D gameOverImage;
 
-static Rectangle roomFloor = {40, 40, 600, 520};
+static Rectangle roomFloor = {0, 0, 520, 520};
 
 static bool gameOver = false;
 static bool win = false;
@@ -25,6 +25,13 @@ void OnLoad_Gameplay(void)
 
     PlayMusicStream(horror);
     SetMusicVolume(horror, 0.6f);
+
+    // Calculate the middle of the screen for the map
+    int middleX = (GetScreenWidth() / 2) - (roomFloor.width / 2);
+    int middleY = (GetScreenHeight() / 2) - (roomFloor.height / 2);
+
+    roomFloor.x = middleX;
+    roomFloor.y = middleY;
 }
 
 void OnUpdate_Gameplay(void)
@@ -46,6 +53,7 @@ void OnUpdate_Gameplay(void)
 
 void OnDraw_Gameplay(void)
 {
+    ClearBackground(BLACK);
     DrawRectangleRec(roomFloor, DARKBROWN);
 
     OnDraw_Player();

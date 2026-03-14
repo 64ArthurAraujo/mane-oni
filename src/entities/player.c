@@ -6,7 +6,7 @@
 
 Entity player =
     {
-        .position = {120.f, 300.f},
+        .position = {300.f, 300.f},
         .speed = {2.5f},
         .width = 32,
         .height = 32,
