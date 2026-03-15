@@ -6,6 +6,7 @@
 #include "screens/screens.h"
 #include "graphics/tileset.h"
 #include "graphics/font.h"
+#include "map/parser.h"
 #include <math.h>
 
 
@@ -21,6 +22,8 @@ int main()
 	SearchAndSetResourceDir("resources");
 
 	LoadFonts();
+	ParseMap();
+
 	ChangeScreen(MENU);
 
 	while (!WindowShouldClose())

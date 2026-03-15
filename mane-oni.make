@@ -47,7 +47,7 @@ OBJDIR = obj/x64/Debug/mane-oni
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c++17
-LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Debug/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
 
@@ -58,7 +58,7 @@ OBJDIR = obj/x86/Debug/mane-oni
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c++17
-LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Debug/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32
 
@@ -69,7 +69,7 @@ OBJDIR = obj/ARM64/Debug/mane-oni
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c++17
-LIBS += bin/Debug/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Debug/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Debug/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS)
 
@@ -80,7 +80,7 @@ OBJDIR = obj/x64/Release/mane-oni
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c++17
-LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Release/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
 
@@ -91,7 +91,7 @@ OBJDIR = obj/x86/Release/mane-oni
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c++17
-LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Release/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32 -s
 
@@ -102,7 +102,7 @@ OBJDIR = obj/ARM64/Release/mane-oni
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c++17
-LIBS += bin/Release/libraylib.a -lpthread -lm -ldl -lrt -lX11
+LIBS += bin/Release/libraylib.a -llua -lpthread -lm -ldl -lrt -lX11
 LDDEPS += bin/Release/libraylib.a
 ALL_LDFLAGS += $(LDFLAGS) -s
 
@@ -124,6 +124,7 @@ GENERATED += $(OBJDIR)/gameplay.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/menu.o
 GENERATED += $(OBJDIR)/oni.o
+GENERATED += $(OBJDIR)/parser.o
 GENERATED += $(OBJDIR)/player.o
 GENERATED += $(OBJDIR)/screens.o
 GENERATED += $(OBJDIR)/tileset.o
@@ -133,6 +134,7 @@ OBJECTS += $(OBJDIR)/gameplay.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/menu.o
 OBJECTS += $(OBJDIR)/oni.o
+OBJECTS += $(OBJDIR)/parser.o
 OBJECTS += $(OBJDIR)/player.o
 OBJECTS += $(OBJDIR)/screens.o
 OBJECTS += $(OBJDIR)/tileset.o
@@ -215,6 +217,9 @@ $(OBJDIR)/tileset.o: src/graphics/tileset.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/parser.o: src/map/parser.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/gameplay.o: src/screens/gameplay.c
