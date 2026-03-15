@@ -127,6 +127,7 @@ GENERATED += $(OBJDIR)/oni.o
 GENERATED += $(OBJDIR)/parser.o
 GENERATED += $(OBJDIR)/player.o
 GENERATED += $(OBJDIR)/screens.o
+GENERATED += $(OBJDIR)/string.o
 GENERATED += $(OBJDIR)/tileset.o
 OBJECTS += $(OBJDIR)/entity.o
 OBJECTS += $(OBJDIR)/font.o
@@ -137,6 +138,7 @@ OBJECTS += $(OBJDIR)/oni.o
 OBJECTS += $(OBJDIR)/parser.o
 OBJECTS += $(OBJDIR)/player.o
 OBJECTS += $(OBJDIR)/screens.o
+OBJECTS += $(OBJDIR)/string.o
 OBJECTS += $(OBJDIR)/tileset.o
 
 # Rules
@@ -229,6 +231,9 @@ $(OBJDIR)/menu.o: src/screens/menu.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/screens.o: src/screens/screens.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/string.o: src/util/string.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
