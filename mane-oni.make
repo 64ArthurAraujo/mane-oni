@@ -122,6 +122,7 @@ GENERATED += $(OBJDIR)/entity.o
 GENERATED += $(OBJDIR)/font.o
 GENERATED += $(OBJDIR)/gameplay.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/map-renderer.o
 GENERATED += $(OBJDIR)/menu.o
 GENERATED += $(OBJDIR)/oni.o
 GENERATED += $(OBJDIR)/parser.o
@@ -133,6 +134,7 @@ OBJECTS += $(OBJDIR)/entity.o
 OBJECTS += $(OBJDIR)/font.o
 OBJECTS += $(OBJDIR)/gameplay.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/map-renderer.o
 OBJECTS += $(OBJDIR)/menu.o
 OBJECTS += $(OBJDIR)/oni.o
 OBJECTS += $(OBJDIR)/parser.o
@@ -213,6 +215,9 @@ $(OBJDIR)/player.o: src/entities/player.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/font.o: src/graphics/font.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/map-renderer.o: src/graphics/map-renderer.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/tileset.o: src/graphics/tileset.c

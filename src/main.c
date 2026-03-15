@@ -22,8 +22,6 @@ int main()
 	SearchAndSetResourceDir("resources");
 
 	LoadFonts();
-	TileMap map = ParseMap("maps/genkan.lua");
-
 	ChangeScreen(MENU);
 
 	while (!WindowShouldClose())
@@ -47,7 +45,6 @@ int main()
 		EndDrawing();
 	}
 
-	UnloadMap(&map);
 	ChangeScreen(NONE);
 	UnloadFonts();
 	CloseAudioDevice();

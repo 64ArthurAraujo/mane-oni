@@ -3,88 +3,57 @@
 #include "entities/entity.h"
 #include "entities/player.h"
 #include "entities/oni.h"
+#include "graphics/tileset.h"
+#include "graphics/map-renderer.h"
+#include "map/parser.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 static Music horror;
-static Texture2D gameOverImage;
 
-static Rectangle roomFloor = {0, 0, 520, 520};
-
-static bool gameOver = false;
-static bool win = false;
-
-Rectangle obstacles[] = {
-    {180, 180, 120, 30},
-    {500, 380, 80, 100},
-    {250, 450, 200, 30}
-};
+static TileMap currentMap = {0};
+static TileSet* mapTilests = NULL;
+static int tileSize = 32;
 
 void OnLoad_Gameplay(void)
 {
     horror = LoadMusicStream("sounds/horor.ogg");
-    gameOverImage = LoadTexture("graphics/gameover.png");
 
-    gameOver = false;
-    win = false;
+    currentMap = ParseMap("maps/genkan.lua");
+    mapTilests = (TileSet*) malloc(currentMap.mapTilesetCount * sizeof(TileSet));
 
-    OnLoad_Player();
-    OnLoad_Oni();
+    // initialize tilesets
+    for (int i = 0; i < currentMap.mapTilesetCount; i++)
+    {
+        char path[256];
+        snprintf(path, sizeof(path), "graphics/tilesets/%s.png", currentMap.mapTilesets[i].name);
+        mapTilests[i] = LoadTileSet(path, tileSize, tileSize);
+    }
 
     PlayMusicStream(horror);
-    SetMusicVolume(horror, 0.6f);
-
-    // Calculate the middle of the screen for the map
-    int middleX = (GetScreenWidth() / 2) - (roomFloor.width / 2);
-    int middleY = (GetScreenHeight() / 2) - (roomFloor.height / 2);
-
-    roomFloor.x = middleX;
-    roomFloor.y = middleY;
+    SetMusicVolume(horror, 0.4f);
 }
 
 void OnUpdate_Gameplay(void)
 {
-    if (!gameOver && !win)
-    {
-        OnUpdate_Player(roomFloor, obstacles, 3);
-        OnUpdate_Oni(roomFloor, obstacles, 3);
-
-        if (CheckCollisionRecs(GetEntityHitbox(GetPlayer()), GetEntityHitbox(GetOni())))
-        {
-            gameOver = true;
-            StopMusicStream(horror);
-        }
-    }
-
     UpdateMusicStream(horror);
 }
 
 void OnDraw_Gameplay(void)
 {
     ClearBackground(BLACK);
-    DrawRectangleRec(roomFloor, DARKBROWN);
-
-    for (int i = 0; i < 3; i++)
-    {
-        DrawRectangleRec(obstacles[i], BROWN);
-        DrawRectangleLinesEx(obstacles[i], 4, DARKBROWN);
-    }
-
-    OnDraw_Player();
-    OnDraw_Oni();
-
-    if (gameOver)
-    {
-        DrawTexturePro(gameOverImage,
-                       (Rectangle){0, 0, (float)gameOverImage.width, (float)gameOverImage.height}, // source = full image
-                       (Rectangle){0, 0, (float)GetScreenWidth(), (float)GetScreenHeight()},       // dest   = full window
-                       (Vector2){0, 0},                                                            // origin
-                       0.0f,                                                                       // rotation
-                       WHITE);
-    }
+    DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, (Vector2){0,0});
 }
 
 void OnUnload_Gameplay(void)
 {
+    for (int i = 0; i < currentMap.mapTilesetCount; i++)
+        UnloadTileSet(&mapTilests[i]);
+    
+    free(mapTilests);
+    mapTilests = NULL;
+
+    UnloadMap(&currentMap);
     UnloadMusicStream(horror);
-    OnUnload_Player();
-    OnUnload_Oni();
 }
