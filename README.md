@@ -8,3 +8,5 @@ https://www.spriters-resource.com/pc_computer/aooni/
 https://aooni.fandom.com/bjn/wiki/Characters_Sprites
 
 https://aooni.fandom.com/wiki/Sound
+
+https://github.com/nolife99/ao-oni
