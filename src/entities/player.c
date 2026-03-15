@@ -4,6 +4,8 @@
 #include "entity.h"
 #include "graphics/sprite.h"
 #include "util/tilemap-utils.h"
+#include "raymath.h"
+#include <math.h>
 
 extern TileMap currentMap;
 extern int tileSize;
@@ -12,16 +14,24 @@ extern Vector2 globalOffset;
 
 Entity player =
     {
-        .position = {300.f, 300.f},
+        .position = {0, 0},
         .speed = {2.5f},
-        .width = 32,
+        .width = 30,
         .height = 32,
 };
 
 AnimatedSprite playerSprite = {};
 
+bool playerMoving = false;
+Vector2 targetPos = {0};
+
+float SnapToTile(float value);
+Vector2 SnapVector2ToTile(Vector2 v);
+
 void OnLoad_Player()
 {
+    player.position = SnapVector2ToTile((Vector2){300.f, 300.f});
+
     playerSprite.texture = LoadTexture("graphics/hiroshi.png");
     playerSprite.frameCount = 4;
     playerSprite.frameSpeed = 0.12f;
@@ -35,69 +45,96 @@ void OnLoad_Player()
 
 void OnUpdate_Player()
 {
-    Vector2 move = {0};
+    float moveSpeed = 120.0f * GetFrameTime(); // pixels per second
 
-    if (IsKeyDown(KEY_D))
+    if (!playerMoving)
     {
-        move.x += player.speed;
-        playerSprite.direction = DIR_RIGHT;
-    }
-    else if (IsKeyDown(KEY_A))
-    {
-        move.x -= player.speed;
-        playerSprite.direction = DIR_LEFT;
-    }
-    else if (IsKeyDown(KEY_S))
-    {
-        move.y += player.speed;
-        playerSprite.direction = DIR_DOWN;
-    }
-    else if (IsKeyDown(KEY_W))
-    {
-        move.y -= player.speed;
-        playerSprite.direction = DIR_UP;
-    }
+        Vector2 move = {0};
 
-    bool isMoving = (move.x != 0 || move.y != 0);
-
-    if (isMoving)
-    {
-        Vector2 newPos = {player.position.x + move.x, player.position.y + move.y};
-
-        Rectangle nextHitboxPos = {newPos.x, newPos.y, player.width, player.height};
-
-        Vector2 corners[4] = {
-            {nextHitboxPos.x, nextHitboxPos.y},
-            {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y},
-            {nextHitboxPos.x, nextHitboxPos.y + nextHitboxPos.height},
-            {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y + nextHitboxPos.height}};
-
-        bool canMove = true;
-
-        for (int i = 0; i < 4; i++)
+        if (IsKeyDown(KEY_D))
         {
-            if (!isWalkableAt(&currentMap, corners[i], collisionLayerIndex, tileSize))
-            {
-                canMove = false;
-                break;
-            }
+            move.x = tileSize;
+            playerSprite.direction = DIR_RIGHT;
+        }
+        else if (IsKeyDown(KEY_A))
+        {
+            move.x = -tileSize;
+            playerSprite.direction = DIR_LEFT;
+        }
+        else if (IsKeyDown(KEY_S))
+        {
+            move.y = tileSize;
+            playerSprite.direction = DIR_DOWN;
+        }
+        else if (IsKeyDown(KEY_W))
+        {
+            move.y = -tileSize;
+            playerSprite.direction = DIR_UP;
         }
 
-        if (canMove)
+        if (move.x != 0 || move.y != 0)
         {
-            player.position = newPos;
+            Vector2 newPos = {
+                player.position.x + move.x,
+                player.position.y + move.y};
 
-            playerSprite.frameTimer += GetFrameTime();
+            Rectangle nextHitboxPos = {
+                newPos.x,
+                newPos.y,
+                player.width,
+                player.height};
 
-            if (playerSprite.frameTimer >= playerSprite.frameSpeed)
+            Vector2 corners[4] = {
+                {nextHitboxPos.x, nextHitboxPos.y},
+                {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y},
+                {nextHitboxPos.x, nextHitboxPos.y + nextHitboxPos.height},
+                {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y + nextHitboxPos.height}};
+
+            bool canMove = true;
+
+            for (int i = 0; i < 4; i++)
             {
-                playerSprite.frameTimer = 0;
-                playerSprite.currentFrame = (playerSprite.currentFrame + 1) % playerSprite.frameCount;
+                if (!isWalkableAt(&currentMap, corners[i], collisionLayerIndex, tileSize))
+                {
+                    canMove = false;
+                    break;
+                }
             }
+
+            if (canMove)
+            {
+                targetPos = newPos;
+                playerMoving = true;
+            }
+        }
+    }
+
+    if (playerMoving)
+    {
+        Vector2 dir = {
+            targetPos.x - player.position.x,
+            targetPos.y - player.position.y};
+
+        float dist = Vector2Length(dir);
+
+        if (dist <= moveSpeed)
+        {
+            player.position = targetPos;
+            playerMoving = false;
         }
         else
         {
-            playerSprite.currentFrame = 0;
+            dir = Vector2Normalize(dir);
+            player.position.x += dir.x * moveSpeed;
+            player.position.y += dir.y * moveSpeed;
+        }
+
+        playerSprite.frameTimer += GetFrameTime();
+
+        if (playerSprite.frameTimer >= playerSprite.frameSpeed)
+        {
+            playerSprite.frameTimer = 0;
+            playerSprite.currentFrame = (playerSprite.currentFrame + 1) % playerSprite.frameCount;
         }
     }
     else
@@ -136,4 +173,14 @@ void OnUnload_Player()
 Entity GetPlayer()
 {
     return player;
+}
+
+float SnapToTile(float value)
+{
+    return ((int)(value / tileSize)) * tileSize;
+}
+
+Vector2 SnapVector2ToTile(Vector2 v)
+{
+    return (Vector2){SnapToTile(v.x), SnapToTile(v.y)};
 }
