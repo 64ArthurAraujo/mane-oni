@@ -13,7 +13,7 @@
 static Music horror;
 
 static TileMap currentMap = {0};
-static TileSet* mapTilests = NULL;
+static TileSet *mapTilests = NULL;
 static int tileSize = 32;
 
 void OnLoad_Gameplay(void)
@@ -21,7 +21,7 @@ void OnLoad_Gameplay(void)
     horror = LoadMusicStream("sounds/horor.ogg");
 
     currentMap = ParseMap("maps/genkan.lua");
-    mapTilests = (TileSet*) malloc(currentMap.mapTilesetCount * sizeof(TileSet));
+    mapTilests = (TileSet *)malloc(currentMap.mapTilesetCount * sizeof(TileSet));
 
     // initialize tilesets
     for (int i = 0; i < currentMap.mapTilesetCount; i++)
@@ -43,14 +43,23 @@ void OnUpdate_Gameplay(void)
 void OnDraw_Gameplay(void)
 {
     ClearBackground(BLACK);
-    DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, (Vector2){0,0});
+
+    float mapPixelWidth = currentMap.width * tileSize;
+    float mapPixelHeight = currentMap.height * tileSize;
+
+    Vector2 offset = {
+        (GetScreenWidth() - mapPixelWidth) * 0.5f,
+        (GetScreenHeight() - mapPixelHeight) * 0.5f
+    };
+
+    DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, offset);
 }
 
 void OnUnload_Gameplay(void)
 {
     for (int i = 0; i < currentMap.mapTilesetCount; i++)
         UnloadTileSet(&mapTilests[i]);
-    
+
     free(mapTilests);
     mapTilests = NULL;
 
