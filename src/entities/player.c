@@ -27,7 +27,7 @@ void OnLoad_Player()
     playerSprite.sourceRec = (Rectangle){0, 0, playerSprite.frameWidth, playerSprite.frameHeight};
 }
 
-void OnUpdate_Player(Rectangle roomFloor, Rectangle obstacles[], int obs_count)
+void OnUpdate_Player()
 {
     Vector2 move = {0};
 
@@ -58,27 +58,7 @@ void OnUpdate_Player(Rectangle roomFloor, Rectangle obstacles[], int obs_count)
     {
         Vector2 newPos = {player.position.x + move.x, player.position.y + move.y};
 
-        if (newPos.x < roomFloor.x)
-            newPos.x = roomFloor.x;
-        if (newPos.x + player.width > roomFloor.x + roomFloor.width)
-            newPos.x = roomFloor.x + roomFloor.width - player.width;
-        if (newPos.y < roomFloor.y)
-            newPos.y = roomFloor.y;
-        if (newPos.y + player.height > roomFloor.y + roomFloor.height)
-            newPos.y = roomFloor.y + roomFloor.height - player.height;
-
         bool canMove = true;
-
-        Rectangle playerRect = {newPos.x, newPos.y, player.width, player.height};
-
-        for (int i = 0; i < obs_count; i++)
-        {
-            if (CheckCollisionRecs(playerRect, obstacles[i]))
-            {
-                canMove = false;
-                break;
-            }
-        }
 
         if (canMove)
         {

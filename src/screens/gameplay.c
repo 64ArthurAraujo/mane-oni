@@ -31,12 +31,15 @@ void OnLoad_Gameplay(void)
         mapTilests[i] = LoadTileSet(path, tileSize, tileSize);
     }
 
+    OnLoad_Player();
+
     PlayMusicStream(horror);
     SetMusicVolume(horror, 0.4f);
 }
 
 void OnUpdate_Gameplay(void)
 {
+    OnUpdate_Player();
     UpdateMusicStream(horror);
 }
 
@@ -53,10 +56,14 @@ void OnDraw_Gameplay(void)
     };
 
     DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, offset);
+
+    OnDraw_Player();
 }
 
 void OnUnload_Gameplay(void)
 {
+    OnUnload_Player();
+    
     for (int i = 0; i < currentMap.mapTilesetCount; i++)
         UnloadTileSet(&mapTilests[i]);
 
