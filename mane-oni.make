@@ -129,6 +129,7 @@ GENERATED += $(OBJDIR)/parser.o
 GENERATED += $(OBJDIR)/player.o
 GENERATED += $(OBJDIR)/screens.o
 GENERATED += $(OBJDIR)/string.o
+GENERATED += $(OBJDIR)/tilemap-utils.o
 GENERATED += $(OBJDIR)/tileset.o
 OBJECTS += $(OBJDIR)/entity.o
 OBJECTS += $(OBJDIR)/font.o
@@ -141,6 +142,7 @@ OBJECTS += $(OBJDIR)/parser.o
 OBJECTS += $(OBJDIR)/player.o
 OBJECTS += $(OBJDIR)/screens.o
 OBJECTS += $(OBJDIR)/string.o
+OBJECTS += $(OBJDIR)/tilemap-utils.o
 OBJECTS += $(OBJDIR)/tileset.o
 
 # Rules
@@ -239,6 +241,9 @@ $(OBJDIR)/screens.o: src/screens/screens.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/string.o: src/util/string.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/tilemap-utils.o: src/util/tilemap-utils.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

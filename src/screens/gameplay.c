@@ -12,9 +12,11 @@
 
 static Music horror;
 
-static TileMap currentMap = {0};
+TileMap currentMap = {0};
 static TileSet *mapTilests = NULL;
-static int tileSize = 32;
+int tileSize = 32;
+int collisionLayerIndex = 0;
+Vector2 globalOffset = {0,0};
 
 void OnLoad_Gameplay(void)
 {
@@ -50,20 +52,19 @@ void OnDraw_Gameplay(void)
     float mapPixelWidth = currentMap.width * tileSize;
     float mapPixelHeight = currentMap.height * tileSize;
 
-    Vector2 offset = {
+    globalOffset = (Vector2){
         (GetScreenWidth() - mapPixelWidth) * 0.5f,
         (GetScreenHeight() - mapPixelHeight) * 0.5f
     };
 
-    DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, offset);
-
+    DrawTileMap(&currentMap, mapTilests, tileSize, tileSize, globalOffset);
     OnDraw_Player();
 }
 
 void OnUnload_Gameplay(void)
 {
     OnUnload_Player();
-    
+
     for (int i = 0; i < currentMap.mapTilesetCount; i++)
         UnloadTileSet(&mapTilests[i]);
 

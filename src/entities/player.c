@@ -2,7 +2,13 @@
 #include "player.h"
 #include "oni.h"
 #include "entity.h"
-#include "../graphics/sprite.h"
+#include "graphics/sprite.h"
+#include "util/tilemap-utils.h"
+
+extern TileMap currentMap;
+extern int tileSize;
+extern int collisionLayerIndex;
+extern Vector2 globalOffset;
 
 Entity player =
     {
@@ -58,7 +64,24 @@ void OnUpdate_Player()
     {
         Vector2 newPos = {player.position.x + move.x, player.position.y + move.y};
 
+        Rectangle nextHitboxPos = {newPos.x, newPos.y, player.width, player.height};
+
+        Vector2 corners[4] = {
+            {nextHitboxPos.x, nextHitboxPos.y},
+            {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y},
+            {nextHitboxPos.x, nextHitboxPos.y + nextHitboxPos.height},
+            {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y + nextHitboxPos.height}};
+
         bool canMove = true;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (!isWalkableAt(&currentMap, corners[i], collisionLayerIndex, tileSize))
+            {
+                canMove = false;
+                break;
+            }
+        }
 
         if (canMove)
         {
@@ -88,13 +111,20 @@ void OnUpdate_Player()
 
 void OnDraw_Player()
 {
+    Vector2 hitboxPos = {
+        player.position.x + globalOffset.x,
+        player.position.y + globalOffset.y};
+
+    Vector2 spritePos = {
+        hitboxPos.x,
+        hitboxPos.y - (player.height / 2)};
+
     DrawTextureRec(playerSprite.texture,
                    playerSprite.sourceRec,
-                   (Vector2){player.position.x, player.position.y - (player.height / 2)},
+                   spritePos,
                    WHITE);
 
-    // Hitbox              
-    DrawRectangleLines((int)player.position.x, (int)player.position.y,
+    DrawRectangleLines((int)hitboxPos.x, (int)hitboxPos.y,
                        player.width, player.height, WHITE);
 }
 
