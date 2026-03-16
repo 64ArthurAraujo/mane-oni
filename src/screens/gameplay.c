@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static Music horror;
+static Music wind;
 
 TileMap currentMap = {0};
 static TileSet *mapTilests = NULL;
@@ -20,7 +20,7 @@ Vector2 globalOffset = {0,0};
 
 void OnLoad_Gameplay(void)
 {
-    horror = LoadMusicStream("sounds/horor.ogg");
+    wind = LoadMusicStream("sounds/wind.ogg");
 
     currentMap = ParseMap("maps/genkan.lua");
     mapTilests = (TileSet *)malloc(currentMap.mapTilesetCount * sizeof(TileSet));
@@ -35,14 +35,14 @@ void OnLoad_Gameplay(void)
 
     OnLoad_Player();
 
-    PlayMusicStream(horror);
-    SetMusicVolume(horror, 0.4f);
+    PlayMusicStream(wind);
+    SetMusicVolume(wind, 0.6f);
 }
 
 void OnUpdate_Gameplay(void)
 {
     OnUpdate_Player();
-    UpdateMusicStream(horror);
+    UpdateMusicStream(wind);
 }
 
 void OnDraw_Gameplay(void)
@@ -72,5 +72,5 @@ void OnUnload_Gameplay(void)
     mapTilests = NULL;
 
     UnloadMap(&currentMap);
-    UnloadMusicStream(horror);
+    UnloadMusicStream(wind);
 }
