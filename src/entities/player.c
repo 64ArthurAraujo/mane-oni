@@ -14,7 +14,7 @@ extern Vector2 globalOffset;
 
 Entity player = {
     .position = {0, 0},
-    .speed = {2.5f},
+    .speed = {2.7f},
     .width = 32,
     .height = 32,
 };
