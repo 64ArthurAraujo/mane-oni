@@ -9,7 +9,6 @@
 #include "map/parser.h"
 #include <math.h>
 
-
 int main()
 {
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);

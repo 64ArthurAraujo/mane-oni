@@ -12,12 +12,11 @@ extern int tileSize;
 extern int collisionLayerIndex;
 extern Vector2 globalOffset;
 
-Entity player =
-    {
-        .position = {0, 0},
-        .speed = {2.5f},
-        .width = 30,
-        .height = 32,
+Entity player = {
+    .position = {0, 0},
+    .speed = {2.5f},
+    .width = 32,
+    .height = 32,
 };
 
 AnimatedSprite playerSprite = {};
@@ -27,6 +26,7 @@ Vector2 targetPos = {0};
 
 float SnapToTile(float value);
 Vector2 SnapVector2ToTile(Vector2 v);
+bool CanMoveTo(Vector2 newPos);
 
 void OnLoad_Player()
 {
@@ -45,7 +45,7 @@ void OnLoad_Player()
 
 void OnUpdate_Player()
 {
-    float moveSpeed = 120.0f * GetFrameTime(); // pixels per second
+    float moveSpeed = 120.0f * GetFrameTime();
 
     if (!playerMoving)
     {
@@ -78,30 +78,7 @@ void OnUpdate_Player()
                 player.position.x + move.x,
                 player.position.y + move.y};
 
-            Rectangle nextHitboxPos = {
-                newPos.x,
-                newPos.y,
-                player.width,
-                player.height};
-
-            Vector2 corners[4] = {
-                {nextHitboxPos.x, nextHitboxPos.y},
-                {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y},
-                {nextHitboxPos.x, nextHitboxPos.y + nextHitboxPos.height},
-                {nextHitboxPos.x + nextHitboxPos.width, nextHitboxPos.y + nextHitboxPos.height}};
-
-            bool canMove = true;
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (!isWalkableAt(&currentMap, corners[i], collisionLayerIndex, tileSize))
-                {
-                    canMove = false;
-                    break;
-                }
-            }
-
-            if (canMove)
+            if (CanMoveTo(newPos))
             {
                 targetPos = newPos;
                 playerMoving = true;
@@ -111,10 +88,7 @@ void OnUpdate_Player()
 
     if (playerMoving)
     {
-        Vector2 dir = {
-            targetPos.x - player.position.x,
-            targetPos.y - player.position.y};
-
+        Vector2 dir = Vector2Subtract(targetPos, player.position);
         float dist = Vector2Length(dir);
 
         if (dist <= moveSpeed)
@@ -156,13 +130,18 @@ void OnDraw_Player()
         hitboxPos.x,
         hitboxPos.y - (player.height / 2)};
 
-    DrawTextureRec(playerSprite.texture,
-                   playerSprite.sourceRec,
-                   spritePos,
-                   WHITE);
+    DrawTextureRec(
+        playerSprite.texture,
+        playerSprite.sourceRec,
+        spritePos,
+        WHITE);
 
-    DrawRectangleLines((int)hitboxPos.x, (int)hitboxPos.y,
-                       player.width, player.height, WHITE);
+    DrawRectangleLines(
+        (int)hitboxPos.x,
+        (int)hitboxPos.y,
+        player.width,
+        player.height,
+        WHITE);
 }
 
 void OnUnload_Player()
@@ -175,6 +154,28 @@ Entity GetPlayer()
     return player;
 }
 
+bool CanMoveTo(Vector2 newPos)
+{
+    float left = newPos.x;
+    float right = newPos.x + player.width - 1;
+    float top = newPos.y;
+    float bottom = newPos.y + player.height - 1;
+
+    if (!isWalkableAt(&currentMap, (Vector2){left, top}, collisionLayerIndex, tileSize))
+        return false;
+
+    if (!isWalkableAt(&currentMap, (Vector2){right, top}, collisionLayerIndex, tileSize))
+        return false;
+
+    if (!isWalkableAt(&currentMap, (Vector2){left, bottom}, collisionLayerIndex, tileSize))
+        return false;
+
+    if (!isWalkableAt(&currentMap, (Vector2){right, bottom}, collisionLayerIndex, tileSize))
+        return false;
+
+    return true;
+}
+
 float SnapToTile(float value)
 {
     return ((int)(value / tileSize)) * tileSize;
@@ -182,5 +183,7 @@ float SnapToTile(float value)
 
 Vector2 SnapVector2ToTile(Vector2 v)
 {
-    return (Vector2){SnapToTile(v.x), SnapToTile(v.y)};
+    return (Vector2){
+        SnapToTile(v.x),
+        SnapToTile(v.y)};
 }
