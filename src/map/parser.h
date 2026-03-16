@@ -1,10 +1,12 @@
 #pragma once
+#include <stdbool.h>
 
 typedef struct
 {
     int width;
     int height;
     int id;
+    bool visible;
     char *name;
     int *data;
 } Layer;

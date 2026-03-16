@@ -8,6 +8,7 @@
 #include <string.h>
 #include "util/string.h"
 
+bool get_field_bool(lua_State *L, char *field);
 const char* get_field_string(lua_State *L, char *field);
 int get_field_int(lua_State *L, char *field);
 
@@ -68,6 +69,7 @@ TileMap ParseMap(char* path)
 
         int id = get_field_int(L, "id");
         const char *name = get_field_string(L, "name");
+        bool visible = get_field_bool(L, "visible");
 
         // parse data
         lua_getfield(L, -1, "data");
@@ -88,6 +90,7 @@ TileMap ParseMap(char* path)
         layers[i-1].width = width;
         layers[i-1].height = height;
         layers[i-1].data = data;
+        layers[i-1].visible = visible;
 
         lua_pop(L, 1);
         lua_pop(L, 1);
@@ -108,6 +111,15 @@ TileMap ParseMap(char* path)
     map.layers = layers;
 
     return map;
+}
+
+bool get_field_bool(lua_State *L, char *field)
+{
+    lua_getfield(L, -1, field);
+    bool value = lua_toboolean(L, -1);
+    lua_pop(L, 1); 
+
+    return value;
 }
 
 const char* get_field_string(lua_State *L, char *field)
